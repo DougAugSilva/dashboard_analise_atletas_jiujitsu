@@ -6,9 +6,8 @@ import time
 
 # Extrai o html da pagina toda
 def get_page_content(url, headers, params):
-    # Corrigido: usando os argumentos passados para a função
     try:
-        response = requests.get(url=url, headers=headers, params=params, timeout=10)
+        response = requests.get(url=url, headers=headers, params=params, timeout=15)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, 'html.parser')
         return soup
@@ -22,15 +21,26 @@ def parse_athletes(soup, k, c, g, b, d):
         return None
     
     athletes = []
+    #.Nova ...........................
     # Busca o corpo da tabela para evitar o header
+    # Tenta pegar do tbody, se não der, pega da table direta
     tbody = table.find('tbody')
-    rows = tbody.find_all('tr') if tbody else table.find_all('tr')[1:]
-    
+    if tbody:
+        rows = tbody.find_all('tr')
+    else:
+        rows = table.find_all('tr')
+    #..................................
     if not rows:
         return None
 
     for row in rows:
         try:
+            # Nova: Verifica se é cabeçalho antes de tentar processar
+            # Se a linha tiver "th" ou a classe 'position' for na verdade um título
+            if row.find('th') or "position" in row.get_text(strip=True).lower():
+                # É cabeçalho, pula
+                continue
+
             # Posição
             position_cell = row.find('td', class_='position')
             position = position_cell.get_text(strip=True) if position_cell else "N/A"
@@ -92,11 +102,12 @@ HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/
 
 # Parâmetros base
 PARAMETERS = {
-    'filters[age_division]': 'adult',
-    'filters[belt]': 'black',
-    'filters[gender]': 'male',
-    'filters[limit]': '10',
     'filters[s]': 'ranking-geral-gi',
+    'filters[ranking_category]' : 'adult',
+    'filters[gender]': 'male',
+    'filters[belt]': 'black',
+    'filters[weight]' : 'openclass',
+    'filters[limit]': '10',
     'page': 1
 }
 
@@ -105,29 +116,29 @@ filter_soup = get_page_content(URL, HEADERS, PARAMETERS)
 
 # Mapeamento dos filtros baseados no ID do HTML
 kimono = list_filters(filter_soup, 'filters_s')
-category = list_filters(filter_soup, 'filters_ranking_category')
-gender = list_filters(filter_soup, 'filters_gender')
-belt = list_filters(filter_soup, 'filters_belt')
-division = list_filters(filter_soup, 'weight_filter')
+age_list = list_filters(filter_soup, 'filters_age_division')
+gender_list = list_filters(filter_soup, 'filters_gender')
+belt_list = list_filters(filter_soup, 'filters_belt')
+weight_list = list_filters(filter_soup, 'weight_filter')
 
 all_athletes = []
 limit = 30
 
 # Filtrando
-category = ['adult']
-belt = ['black']
-kimono = ['ranking-geral-gi']
+target_ages = ['adult'] 
+target_belts = ['black']
+target_kimonos = ['ranking-geral-gi']
 
 # Loop de Extração
-for k, c, g, b, d in product(kimono, category, gender, belt, division):
+for k, c, g, b, d in product(target_kimonos, target_ages, gender_list, target_belts, weight_list):
     page = 1 # Reinicia a página para cada nova combinação
     while True and page <= limit:
         # Corrigido: Uso de = para atribuição
         PARAMETERS['filters[s]'] = k
-        PARAMETERS['filters[age_division]'] = c
+        PARAMETERS['filters[ranking_category]'] = c
         PARAMETERS['filters[gender]'] = g 
         PARAMETERS['filters[belt]'] = b
-        PARAMETERS['filters[limit]'] = d
+        PARAMETERS['filters[weight]'] = d
         PARAMETERS['page'] = page
         
         print(f"Extraindo: {k}, {c}, {g}, {b}, {d} | Página: {page}")
@@ -141,7 +152,7 @@ for k, c, g, b, d in product(kimono, category, gender, belt, division):
             
         all_athletes.extend(athletes)
         page += 1
-        time.sleep(1) # Delay amigável para o servidor
+        time.sleep(0.8) # Delay amigável para o servidor
 
 # Exportação
 if all_athletes:
