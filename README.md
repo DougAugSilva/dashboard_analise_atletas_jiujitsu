@@ -24,7 +24,7 @@ Depois, foi utilizado o Power BI para a criação de um dashboard para análise 
 
 
 ![Tela 1 do Dashboard](https://github.com/DougAugSilva/dashboard_analise_atletas_jiujitsu/blob/main/images/fig_tela_1.jpg)
-> Tela 1 do Dashboard aberto no Power BI: Comparção entre as diferentes academias.
+> Tela 1 do Dashboard aberto no Power BI: Comparação entre as diferentes academias.
 
 ![Tela 2 do Dashboard](https://github.com/DougAugSilva/dashboard_analise_atletas_jiujitsu/blob/main/images/fig_tela_2.jpg)
 > Tela 2 do Dashboard aberto no Power BI: Análise da diferença de desempenho entre os gêneros em diferentes categorias.
