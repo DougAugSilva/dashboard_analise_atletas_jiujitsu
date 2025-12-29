@@ -1,4 +1,4 @@
-# Dashboard em Power BI de Análise de Performance e <br> Volatilidade Diária com Web Scraping em Python
+# Dashboard para Análise de Atletas de Jiu Jitsu <br> em Power BI com Web Scraping em Python
 
 #### Douglas Augusto da Silva
 [![Linkedin](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/dougaugsilva/)
